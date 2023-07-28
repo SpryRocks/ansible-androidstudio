@@ -7,6 +7,7 @@
     state: "{{ app_state | default('present') }}"
 
 - name: Ensure custom facts directory exists
+  become: false
   file:
     mode: 0755
     path: /etc/ansible/facts.d
@@ -19,6 +20,7 @@
       (ansible_local['cmdlinetools']['settings']['version'] != cmdline_tools_file_name | regex_replace('commandlinetools-mac-(\\d*).*', '\\1'))) }}"
 
 - name: Ensure commandline-tools archive is downloaded
+  become: false
   get_url:
     checksum: 'sha256:{{ cmdline_tools_checksum }}'
     dest: '/tmp/{{ cmdline_tools_file_name }}'
@@ -33,13 +35,13 @@
     loop_var: user
   when: (user.system is not defined) or ((user.system is defined) and (not user.system))
 
-- name: 'Save meta information about the version of {{ app_name }} that was installed'
-  community.general.ini_file:
-    backup: true
-    mode: 0644
-    no_extra_spaces: true
-    option: version
-    path: /etc/ansible/facts.d/cmdlinetools.fact
-    section: settings
-    value: "{{ cmdline_tools_file_name | regex_replace('commandlinetools-mac-(\\d*).*', '\\1') }}"
-  when: install_cmdlinetools
+#- name: 'Save meta information about the version of {{ app_name }} that was installed'
+#  community.general.ini_file:
+#    backup: true
+#    mode: 0644
+#    no_extra_spaces: true
+#    option: version
+#    path: /etc/ansible/facts.d/cmdlinetools.fact
+#    section: settings
+#    value: "{{ cmdline_tools_file_name | regex_replace('commandlinetools-mac-(\\d*).*', '\\1') }}"
+#  when: install_cmdlinetools
